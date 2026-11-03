@@ -1,0 +1,37 @@
+{
+  "schema_version": "1.0",
+  "updated_at": "2026-09-12T00:00:00Z",
+  "catalog_url": "https://raw.githubusercontent.com/orbyss-io/program-kit-releases/main/catalogs/bundles.json",
+  "bundles": {
+    "program-kit": {
+      "name": "Program Kit",
+      "id": "program-kit",
+      "version": "1.0.0-preview.3",
+      "role": "architecture-governed-development",
+      "description": "Guides product intake, founding decisions and modular, vertically sliced Spec Kit delivery through installed skills and scripts.",
+      "author": "Orbyss",
+      "license": "LicenseRef-Program-Kit",
+      "download_url": "https://github.com/orbyss-io/program-kit-releases/releases/download/v1.0.0-preview.3/program-kit-1.0.0-preview.3.zip",
+      "repository": "https://github.com/orbyss-io/program-kit-releases",
+      "requires": {
+        "speckit_version": ">=1.1.1,<2.0.0"
+      },
+      "provides": {
+        "extensions": 3,
+        "presets": 1,
+        "steps": 0,
+        "workflows": 0
+      },
+      "tags": [
+        "architecture",
+        "adr",
+        "governance",
+        "bootstrap",
+        "sdd",
+        "vertical-slicing",
+        "modularity"
+      ],
+      "verified": false
+    }
+  }
+}

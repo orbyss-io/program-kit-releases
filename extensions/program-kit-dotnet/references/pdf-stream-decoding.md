@@ -11,7 +11,7 @@ a missing integration boundary, rather than an attributed shipped parser defect.
 Use the public [ParsingOptions.FilterProvider](https://github.com/UglyToad/PdfPig/blob/v0.1.16/src/UglyToad.PdfPig/ParsingOptions.cs)
 and [IFilterProvider](https://github.com/UglyToad/PdfPig/blob/v0.1.16/src/UglyToad.PdfPig/Filters/IFilterProvider.cs)
 seams. Keep strict parsing; do not patch publisher assemblies or introduce loader
-workarounds. The optional [native reference example](https://github.com/orbyss-io/program-kit-releases/releases/download/v1.0.0-preview.1/program-kit-tooling-1.0.0-preview.1.zip)
+workarounds. The optional [native reference example](https://github.com/orbyss-io/program-kit-releases/releases/download/v1.0.0-preview.3/program-kit-tooling-1.0.0-preview.3.zip)
 uses public PdfPig 0.1.16 and SharpZipLib 1.4.2. Its latter decoder exposes actual
 completion, checksum processing and remaining input; stream EOF or a manually
 verified checksum alone is insufficient. The example pins/lock participate in

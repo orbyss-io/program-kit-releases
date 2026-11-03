@@ -1,6 +1,6 @@
 # Foundation contracts development candidate
 
-The named recipe [foundation-contracts-development-v4.json](https://github.com/orbyss-io/program-kit-releases/releases/download/v1.0.0-preview.1/program-kit-tooling-1.0.0-preview.1.zip)
+The named recipe [foundation-contracts-development-v4.json](https://github.com/orbyss-io/program-kit-releases/releases/download/v1.0.0-preview.3/program-kit-tooling-1.0.0-preview.3.zip)
 selects `0.3.0-contracts.20261006.6` explicitly. The prior v1, v2 and v3 recipes remain preserved for historical evidence.
 Qualification requires the private runtime package/Host path
 through actual F6 managed-host, Nuplane, two-shell and PostgreSQL tests. The public dependency registry,
