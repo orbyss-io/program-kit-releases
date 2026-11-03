@@ -479,7 +479,7 @@ and `/bff/signed-out` typed JSON as protocol contracts. An application-owned pre
 uses `IAuthenticationErrorWriter` for safe browser callback/access-denied output and provides public
 branded sign-out/recovery pages; Keycloak themes cannot render host callback failures. Use stable
 allowlisted codes, escaped text, accessible field/headings/focus and a validated local restart target.
-The [application presentation example](https://github.com/orbyss-io/program-kit-releases/releases/download/v1.0.0-preview.1/program-kit-tooling-1.0.0-preview.1.zip) demonstrates
+The [application presentation example](https://github.com/orbyss-io/program-kit-releases/releases/download/v1.0.0-preview.3/program-kit-tooling-1.0.0-preview.3.zip) demonstrates
 the existing writer and independent cookie-session observation. Register it through the application's
 real HTTP feature and map its public session page separately; qualify against the selected publisher.
 Preserve final private/no-store/no-index/security policies; no route shadowing or private bootstrap

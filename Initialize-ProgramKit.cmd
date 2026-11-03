@@ -1,6 +1,6 @@
 @echo off
 setlocal DisableDelayedExpansion
-set "PROGRAM_KIT_REF=v1.0.0-preview.1"
+set "PROGRAM_KIT_REF=v1.0.0-preview.3"
 
 rem Program Kit consumer bootstrap for a repository that does not already contain Program Kit.
 rem Run from the repository root, directly or through an authorized coding agent.

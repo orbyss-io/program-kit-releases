@@ -17,17 +17,17 @@ Create or choose a project directory, initialize Git, and download the initializ
 asset matching your operating system and chosen version. Inspect it before running.
 The release includes `SHA256SUMS` for verifying downloaded asset bytes.
 
-For example, for the explicitly selected `1.0.0-preview.1`:
+For example, for the explicitly selected `1.0.0-preview.3`:
 
 ```powershell
 git init
-Invoke-WebRequest https://github.com/orbyss-io/program-kit-releases/releases/download/v1.0.0-preview.1/Initialize-ProgramKit-1.0.0-preview.1.cmd -OutFile Initialize-ProgramKit.cmd
+Invoke-WebRequest https://github.com/orbyss-io/program-kit-releases/releases/download/v1.0.0-preview.3/Initialize-ProgramKit-1.0.0-preview.3.cmd -OutFile Initialize-ProgramKit.cmd
 .\Initialize-ProgramKit.cmd codex
 ```
 
 ```bash
 git init
-curl --fail --location https://github.com/orbyss-io/program-kit-releases/releases/download/v1.0.0-preview.1/Initialize-ProgramKit-1.0.0-preview.1.sh --output Initialize-ProgramKit.sh
+curl --fail --location https://github.com/orbyss-io/program-kit-releases/releases/download/v1.0.0-preview.3/Initialize-ProgramKit-1.0.0-preview.3.sh --output Initialize-ProgramKit.sh
 bash Initialize-ProgramKit.sh codex
 ```
 
