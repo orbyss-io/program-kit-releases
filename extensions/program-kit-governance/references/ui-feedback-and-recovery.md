@@ -121,7 +121,7 @@ raw diagnostics. Selected Foundation closed problems carry safe standard fields;
 operation responses and the UI own recovery choices.
 <!-- /program-kit:knowledge-rule -->
 <!-- program-kit:knowledge-rule context.operation-recovery-focused-example -->
-The maintained [operation recovery example](https://github.com/orbyss-io/program-kit-releases/releases/download/v1.0.0-preview.1/program-kit-tooling-1.0.0-preview.1.zip) illustrates these
+The maintained [operation recovery example](https://github.com/orbyss-io/program-kit-releases/releases/download/v1.0.0-preview.2/program-kit-tooling-1.0.0-preview.2.zip) illustrates these
 semantic transitions. Its events require the consumer's reviewed server contract; it supplies
 neither a competing wire schema nor authority to classify every HTTP 400/409 as no effect.
 <!-- /program-kit:knowledge-rule -->

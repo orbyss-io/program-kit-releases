@@ -22,7 +22,7 @@ in a database is not yet resource-side revocation: physical admission is the
 linearization boundary. Keep slow input/staging outside a short guard where the
 storage contract permits it, then validate again after input and guard waits.
 
-The [bounded synthetic reference](https://github.com/orbyss-io/program-kit-releases/releases/download/v1.0.0-preview.1/program-kit-tooling-1.0.0-preview.1.zip) uses
+The [bounded synthetic reference](https://github.com/orbyss-io/program-kit-releases/releases/download/v1.0.0-preview.2/program-kit-tooling-1.0.0-preview.2.zip) uses
 committed SQLite work envelopes and a permanent local OS file guard. It supplies
 no domain SQL schema, broker, paid worker, generic storage framework or distributed
 transaction. Its effect identity includes one opaque resource, work, operation,

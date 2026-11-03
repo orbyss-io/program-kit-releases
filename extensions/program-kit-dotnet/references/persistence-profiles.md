@@ -118,7 +118,7 @@ For selected PostgreSQL, deploy the product schema using the selected migration 
 identity before admitting application users. Runtime startup verifies its required revision,
 schema usage, each table operation and sequence permission through the actual runtime
 connection; it performs no product DDL. Do not use administrator credentials in the app.
-The optional [native lifecycle example](https://github.com/orbyss-io/program-kit-releases/releases/download/v1.0.0-preview.1/program-kit-tooling-1.0.0-preview.1.zip) uses public
+The optional [native lifecycle example](https://github.com/orbyss-io/program-kit-releases/releases/download/v1.0.0-preview.2/program-kit-tooling-1.0.0-preview.2.zip) uses public
 Foundation registration and real CShells activation. Its fixture-only deployment holds a
 transaction-scoped advisory lock around first preparation, while runtime units remain
 concurrent. It never transfers object ownership: unmarked targets, foreign owners and

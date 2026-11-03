@@ -32,10 +32,10 @@ baseline.
 
 ### Application artifacts and identity
 
-[Build.ps1](https://github.com/orbyss-io/program-kit-releases/releases/download/v1.0.0-preview.1/program-kit-tooling-1.0.0-preview.1.zip) builds, tests,
+[Build.ps1](https://github.com/orbyss-io/program-kit-releases/releases/download/v1.0.0-preview.2/program-kit-tooling-1.0.0-preview.2.zip) builds, tests,
 packs to `artifacts/packages/<version>`, stages `artifacts/release-bundle` and invokes the registered
 OpenAPI pipeline. Final descriptor/ZIP production is a separate
-[release_bundle.py](https://github.com/orbyss-io/program-kit-releases/releases/download/v1.0.0-preview.1/program-kit-tooling-1.0.0-preview.1.zip)
+[release_bundle.py](https://github.com/orbyss-io/program-kit-releases/releases/download/v1.0.0-preview.2/program-kit-tooling-1.0.0-preview.2.zip)
 `describe` step. Staged inputs are not yet a finished release.
 
 The descriptor gets version from `VERSION`, binds source commit and host image digest, and currently
@@ -53,24 +53,24 @@ The [runtime profile](../extensions/program-kit-dotnet/references/dotnet-runtime
 assigns descriptor emission to `Orbyss.Foundation.Build` at `orbyss-foundation/feature.json`.
 The bundle reader supports versions 1 and 2, including multiple features per package, and checks
 activation/dependencies/routes.
-[feature_metadata.py](https://github.com/orbyss-io/program-kit-releases/releases/download/v1.0.0-preview.1/program-kit-tooling-1.0.0-preview.1.zip)
+[feature_metadata.py](https://github.com/orbyss-io/program-kit-releases/releases/download/v1.0.0-preview.2/program-kit-tooling-1.0.0-preview.2.zip)
 updates activation, not descriptor emission. Reuse these package, feature and shell identities.
 
-The [OpenAPI pipeline](https://github.com/orbyss-io/program-kit-releases/releases/download/v1.0.0-preview.1/program-kit-tooling-1.0.0-preview.1.zip)
+The [OpenAPI pipeline](https://github.com/orbyss-io/program-kit-releases/releases/download/v1.0.0-preview.2/program-kit-tooling-1.0.0-preview.2.zip)
 exports, normalizes, checks compatibility, generates client types and compiles the consuming
 application for registered contracts. The
-[registry](https://github.com/orbyss-io/program-kit-releases/releases/download/v1.0.0-preview.1/program-kit-tooling-1.0.0-preview.1.zip)
+[registry](https://github.com/orbyss-io/program-kit-releases/releases/download/v1.0.0-preview.2/program-kit-tooling-1.0.0-preview.2.zip)
 starts with `contracts: []`; it does not prove every implemented API is registered.
-The [contract schema](https://github.com/orbyss-io/program-kit-releases/releases/download/v1.0.0-preview.1/program-kit-tooling-1.0.0-preview.1.zip)
+The [contract schema](https://github.com/orbyss-io/program-kit-releases/releases/download/v1.0.0-preview.2/program-kit-tooling-1.0.0-preview.2.zip)
 already records identity, shell, features and output paths. Reference these instead of another API
 catalog. A feature, shell or API is not automatically a separate process.
 
 ### Configuration metadata
 
 Runtime configuration files contain values. The
-[bundle schema](https://github.com/orbyss-io/program-kit-releases/releases/download/v1.0.0-preview.1/program-kit-tooling-1.0.0-preview.1.zip)
+[bundle schema](https://github.com/orbyss-io/program-kit-releases/releases/download/v1.0.0-preview.2/program-kit-tooling-1.0.0-preview.2.zip)
 defines the descriptor envelope, not every application's supported settings.
-The [SPA-PKCE schema](https://github.com/orbyss-io/program-kit-releases/releases/download/v1.0.0-preview.1/program-kit-tooling-1.0.0-preview.1.zip)
+The [SPA-PKCE schema](https://github.com/orbyss-io/program-kit-releases/releases/download/v1.0.0-preview.2/program-kit-tooling-1.0.0-preview.2.zip)
 covers one selected profile.
 
 A receiver needs keys, types, requiredness, supported defaults/constraints, scope, secret
@@ -81,9 +81,9 @@ not initialize application storage or contact external services.
 
 ### Runtime requirements and data changes
 
-[Application Compose](https://github.com/orbyss-io/program-kit-releases/releases/download/v1.0.0-preview.1/program-kit-tooling-1.0.0-preview.1.zip)
+[Application Compose](https://github.com/orbyss-io/program-kit-releases/releases/download/v1.0.0-preview.2/program-kit-tooling-1.0.0-preview.2.zip)
 reveals some image/mount/port/configuration requirements.
-The [identity fixture](https://github.com/orbyss-io/program-kit-releases/releases/download/v1.0.0-preview.1/program-kit-tooling-1.0.0-preview.1.zip)
+The [identity fixture](https://github.com/orbyss-io/program-kit-releases/releases/download/v1.0.0-preview.2/program-kit-tooling-1.0.0-preview.2.zip)
 uses development startup behavior and credentials. Classify these as local examples, and do not
 promote their values into a secret-free release handoff or production configuration contract.
 
@@ -98,8 +98,8 @@ orchestration are outside this feature.
 
 ### Human documentation inputs
 
-[scripts/README.md](https://github.com/orbyss-io/program-kit-releases/releases/download/v1.0.0-preview.1/program-kit-tooling-1.0.0-preview.1.zip) documents native
-commands. [Build props](https://github.com/orbyss-io/program-kit-releases/releases/download/v1.0.0-preview.1/program-kit-tooling-1.0.0-preview.1.zip)
+[scripts/README.md](https://github.com/orbyss-io/program-kit-releases/releases/download/v1.0.0-preview.2/program-kit-tooling-1.0.0-preview.2.zip) documents native
+commands. [Build props](https://github.com/orbyss-io/program-kit-releases/releases/download/v1.0.0-preview.2/program-kit-tooling-1.0.0-preview.2.zip)
 enable compiler XML documentation. Architecture/specification inputs carry intent and journeys,
 but do not establish delivered behavior.
 
@@ -110,7 +110,7 @@ authored explanations independently of agent history.
 
 ## Release independence issue
 
-The [consumer release workflow](https://github.com/orbyss-io/program-kit-releases/releases/download/v1.0.0-preview.1/program-kit-tooling-1.0.0-preview.1.zip)
+The [consumer release workflow](https://github.com/orbyss-io/program-kit-releases/releases/download/v1.0.0-preview.2/program-kit-tooling-1.0.0-preview.2.zip)
 invokes `.specify/extensions/program-kit-building-blocks/scripts/public_availability.py` and reads
 the extension catalog. It uses the result to verify the host image and publish component evidence.
 Removing installed tooling removes this release prerequisite.

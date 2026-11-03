@@ -230,7 +230,7 @@ Every helper must clarify its caller or own an independent meaningful contract.
 Task context projects the actual selected `Orbyss.Foundation.Analyzers` pin and root
 `.editorconfig` declarations. ORB1003 is the one-type-per-file rule. Write an interface,
 request record, decision enum and failure record in four files, including support and
-test types. The maintained [contract example](https://github.com/orbyss-io/program-kit-releases/releases/download/v1.0.0-preview.1/program-kit-tooling-1.0.0-preview.1.zip) compiles against
+test types. The maintained [contract example](https://github.com/orbyss-io/program-kit-releases/releases/download/v1.0.0-preview.2/program-kit-tooling-1.0.0-preview.2.zip) compiles against
 the selected pin; `python tests/validate_contract_layout.py` also proves that combining
 those valid types fails ORB1003. Nested configuration and suppressions still require
 the actual native build; declared root settings alone establish no effective-policy pass.
