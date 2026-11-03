@@ -1,0 +1,57 @@
+Program Kit License 1.0
+
+Copyright (c) 2026 Orbyss. All rights reserved except as expressly granted below.
+
+1. Permission
+
+Orbyss grants you a worldwide, non-exclusive, royalty-free license to download,
+install, run, copy internally, and modify Program Kit for your own personal or
+commercial projects. Your employees and contractors may use these copies solely
+on your behalf. You may keep backups and include Program Kit in private project
+repositories shared with people working on those projects under these terms.
+
+2. Your applications and output
+
+You retain ownership of your independently authored applications and documents.
+You may use, modify, distribute, sublicense, and sell generated application code,
+project configuration, and application templates incorporated or adapted into
+your applications. You may deliver an application and its project sources to a
+client, including the Program Kit files needed to maintain that project, provided
+those files retain this license and are used under its terms. These permissions
+do not allow distributing Program Kit as a toolkit, development platform, template
+collection, competing kit, or standalone component, even as part of a larger offer.
+
+3. Restrictions
+
+Except as expressly permitted above or required by applicable law, you may not
+redistribute, publish, sublicense, sell, rent, or offer Program Kit, modified
+versions, or substantial parts of its toolkit, guidance, or scripts to others
+without Orbyss's prior written permission. Do not remove copyright, license, or
+third-party notices. No trademark rights are granted. Public availability of a
+download or readable source does not grant additional rights.
+
+4. Earlier versions and third-party materials
+
+This license applies only to copies distributed with these terms. It does not
+withdraw permissions for copies previously distributed under the MIT license.
+The original MIT notice is retained in LICENSES/Program-Kit-MIT-legacy.txt.
+Third-party and separately licensed materials remain subject to their own
+licenses and notices; these terms do not restrict rights granted by those
+licenses. Retain the applicable notices when distributing permitted output.
+
+5. Termination
+
+Your rights under this license end if you materially breach it and do not cure
+the breach within 30 days after written notice from Orbyss. Termination does not
+change ownership of your applications or the licenses of third-party materials.
+
+6. Disclaimer
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL ORBYSS
+OR OTHER COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE, TO THE EXTENT PERMITTED BY APPLICABLE LAW.
+

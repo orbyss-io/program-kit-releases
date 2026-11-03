@@ -1,0 +1,186 @@
+# .NET runtime and application-bundle release profile
+
+<!-- program-kit:knowledge-rule context.runtime-profile-applicability -->
+Apply this reference when .NET is selected unless intake explicitly opts out of the Orbyss Foundation building blocks.
+<!-- /program-kit:knowledge-rule -->
+
+## Host boundary
+
+<!-- program-kit:knowledge-rule principle.published-host-boundary -->
+- `Orbyss.Foundation.Host` is application-neutral plumbing: Nuplane package loading, the
+  Nuplane-to-CShells assembly provider, CShells configuration/routing, CShells-only eager activation,
+  and the versioned Program Kit secure-web profile selected from host configuration.
+- It has no application-bundle parser, package/feature policy, database client, business endpoint,
+  application permission identity, or feature-health aggregation.
+- Actual business behavior arrives as runtime packages. Standard authenticated web plumbing is
+  configured by the host's accepted Program Kit web profile; persistence, business endpoints,
+  tasks, and health implementations remain explicit capabilities.
+- Until a feature-health contribution interface exists, do not invent a host dependency-readiness model.
+<!-- /program-kit:knowledge-rule -->
+
+## Feature creation and activation closure
+
+<!-- program-kit:knowledge-rule principle.feature-activation-shape -->
+The authoritative activation shape is `CShells:Shells:<shell-name>:Features:<feature-identity>` in the real
+consumer-owned `shells.json`. Add a reviewed selection deterministically with:
+<!-- /program-kit:knowledge-rule -->
+
+<!-- program-kit:knowledge-rule context.feature-activation-command -->
+```text
+python scripts/feature_metadata.py activate --shells shells.json --shell <name> --feature <identity>
+```
+<!-- /program-kit:knowledge-rule -->
+
+<!-- program-kit:knowledge-rule principle.feature-package-pin-closure -->
+An activatable implementation/provider/bridge project is packable, belongs to the solution, sets `FoundationFeatureIdentity`, declares an exact matching `[ShellFeature("<FoundationFeatureIdentity>")]`, and sets
+`AssemblyName` equal to `PackageId`. It references host-supplied CShells/framework abstractions with
+`PrivateAssets=all`; it does not reference the host, Nuplane runtime, or peer runtime implementations.
+The private, independently pinned `Orbyss.Foundation.Build` package owns descriptor creation and emits
+only `orbyss-foundation/feature.json` during pack. Use `FoundationFeatureDependencies`,
+`FoundationRuntimeDependencies`, `FoundationFeatureRoutes` and `FoundationFeatureDormant` for optional
+metadata. The managed target maps existing `ProgramKit*` declarations during upgrade and rejects
+conflicting declarations. It retains assembly, packability and host-abstraction integration checks.
+Previously packed identical descriptor aliases remain readable; newly packed packages use only the
+canonical path. Consumer activation remains Program Kit's responsibility.
+
+Tasks cover the project, solution inclusion, explicit identity, `shells.json` activation, release-bundle
+inclusion, and missing/duplicate/dependency/route/dormancy tests. `scripts/release_bundle.py stage`
+enforces those constraints while assembling image inputs. The host does not know or repeat this policy.
+
+Activated built-in features obtain their exact package versions from the repository-root
+`Directory.Packages.props` and its imported props files. This includes both managed imports and
+consumer-owned central pins. A managed file that is not imported is not package authority.
+The staging reader supports unconditional literal `PackageVersion Include` items with a literal
+`Version` attribute or child, repository-contained literal imports relative to their containing
+file, and the root-level `Exists` condition matching the imported path (including the optional
+`ProgramKit.BuildingBlocks.props` import). Package identity comparison is case-insensitive.
+<!-- /program-kit:knowledge-rule -->
+
+<!-- program-kit:knowledge-rule principle.central-pin-evaluation -->
+`PKR019` stops staging for missing or duplicate/conflicting pins, ranges/floating versions,
+property expressions, conditional package items/groups, `Update`/`Remove`, and other unsupported
+MSBuild evaluation. Do not copy pins into managed files to bypass the central import graph.
+Packed packages, restored runtime dependencies and the final closure must agree with every
+activated built-in pin; a higher transitive dependency cannot silently change it. A failed stage
+leaves runtime-closure evidence unsatisfied and retains any previous output until validation passes.
+<!-- /program-kit:knowledge-rule -->
+
+## Application release bundle
+
+### Owned build outputs
+
+<!-- program-kit:knowledge-rule principle.sdk-owned-build-outputs -->
+Declare ordinary CLR edges in `projectReferences`. An evaluated `ReferenceOutputAssembly=false`
+or analyzer `OutputItemType` is a build edge, declared separately in `buildProjectReferences`.
+Both edge kinds participate in cycle checks, affected-project selection and source freshness;
+only CLR edges authorize compiled assembly references. Inspect actual PE metadata through the
+maintained `assembly_graph` reader; do not `Assembly.Load` private executable dependencies in an
+architecture test. Existing runtime-closure staging exclusions for build-only references remain.
+
+When an owner must carry an owned producer's derived files, declare `buildOutputCopies` on that
+owner in `config/program-kit/architecture.json`, with exact `project` and `directory: tools/<owned-subdirectory>`.
+Preview the closed XML with `python scripts/build_output_recipe.py --project <owner.csproj>` and
+reconcile it through normal project editing. It publishes the declared build-only producer into
+an owner-private intermediate directory before SDK content enumeration, replaces only its owned
+output subtree, preserves nested payload/notices, exposes transitive content and includes the
+same bytes in the package. No extra task/property/item is exempt merely because a copy is declared.
+Custom output/RID layouts require a separately qualified evaluated adapter; do not broaden globs
+or waive unknown build tasks. Clean/incremental builds, source changes, renamed/removed files,
+transitive test output, package layout and compiled references require actual SDK evidence.
+The installed `scripts/README.md` section **Owned SDK build outputs** gives the declaration and
+preview command at the point of use. PKV003 identifies this bounded alternative for the
+owned-output-copy case while retaining the evaluated-adapter requirement for other custom
+behavior. Treat the suggestion as applicability guidance, not automatic conversion authority.
+<!-- /program-kit:knowledge-rule -->
+
+<!-- program-kit:knowledge-rule context.pdf-loader-focused-context -->
+This recipe does not choose a process boundary or provide a worker runtime. A normal application
+library may reference a PDF package directly. Multi-assembly runtime loading reported with PdfPig
+is tracked in [Nuplane issue 132](https://github.com/valence-works/nuplane/issues/132); do not force
+isolation, replace a parser or alter package bytes/pins to hide that loader failure. Untrusted-parser
+qualification remains the consumer owner's separate responsibility.
+For the selected PdfPig 0.1.16 decode limitation, public filter-provider adaptation,
+exact envelope/deferred-work boundaries and executable bounded example, see
+[PDF stream decoding](pdf-stream-decoding.md). Strict parsing alone is not stream
+decode evidence; unavailable work grants no paid OCR/model fallback authority.
+<!-- /program-kit:knowledge-rule -->
+
+<!-- program-kit:knowledge-rule principle.application-bundle-image-owner -->
+One application release produces an application-bundle.zip, not a consumer Docker image.
+Run the unchanged, digest-pinned `ghcr.io/orbyss-io/foundation-host` published by Foundation.
+Only the Foundation publisher builds that image. Consumers build packable features, not a host
+project, host DLL, Dockerfile, derived image or image-publication pipeline.
+<!-- /program-kit:knowledge-rule -->
+
+<!-- program-kit:knowledge-rule principle.application-runtime-settings -->
+The bundle contains consumer-owned `shells.json`, `hostsettings.json`, `nuplane.settings.json`,
+optional local NuGet package feeds under `packages/`, and a source/version/hash-bound
+`application-bundle.json`. Secrets remain in deployment configuration. Nuplane settings are
+runtime feed/loading configuration, distinct from build-time NuGet.config source mapping.
+`nuplane.settings.json` has one top-level `Nuplane` object. The packager projects it into staged
+hostsettings.json because the published Foundation host reads that file; the host does not parse
+the bundle or separately load nuplane.settings.json. Conflicting duplicate Nuplane settings fail.
+Upgrade copies existing hostsettings.Nuplane into the new consumer-owned file without overwriting
+the original. Reconcile legacy duplicates before changing runtime configuration.
+<!-- /program-kit:knowledge-rule -->
+
+<!-- program-kit:knowledge-rule principle.bundle-staging-runtime-proof -->
+`release_bundle.py stage` composes configuration and verifies available package/activation closure;
+`describe` binds the published Foundation image digest and emits the descriptor, ZIP and checksum.
+Resolve the publisher's version-prefixed tag from the effective selected catalog (`tagTemplate` applied to its exact Host version)
+to its registry digest; do not infer that a cached image belongs to that release.
+Package-free configuration bundles are allowed; active features must still have verified resolution.
+Runtime feeds, watching, reconciliation and reload are explicit deployment choices; configuring a
+feed does not establish successful feature loading. Application identity/version and bundle hashes
+are separate from the independently released Foundation image identity/digest.
+
+Local execution and delivery acceptance mount the bundle's individual settings and package directory
+into the published image, preserving /app and its host binaries. Never mount the entire bundle over
+/app. Prove actual feature activation, application behavior and stop/restart with retained data using
+that image. The release workflow attests and publishes the bundle without building or pushing images.
+
+For the pinned Nuplane 0.0.9-preview.61, local directory feeds extract into
+`<feed>/.installed`. Keep the package archives read-only and mount a separate writable
+runtime directory at `/app/packages/.installed`; preserve or recreate that extraction
+state according to deployment requirements. `FeedResolution.PackageInstallRoot`
+configures remote acquisition and does not relocate local-feed extraction in this version.
+This behavior is defined by the published package's
+[MultiFeedPackageResolver](https://github.com/valence-works/nuplane/blob/c292a10390ada26da54865d46820d3ec327c8888/src/Nuplane/Feeds/MultiFeedPackageResolver.cs).
+Never solve the writable-state requirement by changing the release's package bytes.
+<!-- /program-kit:knowledge-rule -->
+
+<!-- program-kit:knowledge-rule principle.application-bundle-delivery -->
+Architecture binds the external image to a `host-image` target whose path is hostsettings.json and
+plans bundle ownership. Feature planning/tasks cover configuration, package inclusion, activation and
+actual published-host checks. Delivery requires current executed bundle/runtime evidence; bootstrap
+drafts and package availability alone are not runtime acceptance. Setup and upgrade use the same
+repository-sync mechanism; retire untouched managed image files and report conflicts for consumer edits.
+<!-- /program-kit:knowledge-rule -->
+
+## Boundaries retained from the wider .NET profile
+
+<!-- program-kit:knowledge-rule context.optional-ocr-focused-context -->
+For an explicitly authorized one-page OCR operation, use the optional
+[OCR-only operation boundary](../../program-kit-governance/references/ocr-only-operations.md).
+Its recording proof supplies no paid or combined provider acceptance.
+<!-- /program-kit:knowledge-rule -->
+
+<!-- program-kit:knowledge-rule context.source-example-export-context -->
+Optional source examples can be stored as a bounded source pack in the composite
+installation bundle. The logical filenames and bytes remain the publisher sources;
+native preparation reads them without unpacking into installed directories. To
+inspect/export one example, run `python .specify/extensions/program-kit-governance/scripts/asset_sources.py
+--repository . --component program-kit-dotnet --subtree references/examples/<name>`.
+This writes a new artifact directory and starts no provider, build or coding agent.
+<!-- /program-kit:knowledge-rule -->
+
+<!-- program-kit:knowledge-rule principle.retained-runtime-boundaries -->
+- Central package management, locked restore, deterministic pack, and package-source mapping are mandatory.
+- `shells.json`, `hostsettings.json` and `nuplane.settings.json` remain scaffold-once consumer-owned inputs.
+- Managed OpenAPI production runs after package-closure staging through
+  `scripts/openapi_pipeline.py`. Consumers register complete producer, compatibility,
+  isolated client-generation, and application-compile contracts in
+  `config/program-kit/openapi-contracts.json`; the external host remains application-neutral.
+- Core and persistence guidance remains context-owned. No provider-private model, shared `DbContext`,
+  generic repository/store/unit-of-work contract, provider, or readiness probe belongs in the host.
+<!-- /program-kit:knowledge-rule -->

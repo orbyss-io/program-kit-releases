@@ -1,0 +1,416 @@
+# .NET profile
+
+Persistence is separately admitted through `../persistence-profiles.md`; no provider is selected by
+this general .NET profile or by an operational database health probe.
+
+## Baseline
+
+<!-- program-kit:knowledge-rule principle.dotnet-baseline-engineering -->
+When .NET is detected, evaluate and normally enforce:
+
+- a current supported SDK/runtime policy pinned in `global.json` where appropriate;
+- nullable reference types enabled;
+- compiler warnings and selected Roslyn/.NET analyzers treated as errors in CI;
+- explicit cancellation propagation for cancellable I/O and long-running work;
+- async APIs that do not block or hide background work;
+- immutable or deliberately mutable public contracts with compatibility tests;
+- central package/version management and locked/repeatable restore as appropriate;
+- deterministic builds, Source Link, analyzers, formatting, dependency audit, SBOM, and provenance for distributed artifacts;
+- unit, integration, architecture, contract, and acceptance tests selected by risk;
+- ArchUnitNET or an equivalent deterministic check when project or assembly dependency rules need executable enforcement;
+- Reqnroll when business-critical multistep behavior benefits from executable examples.
+<!-- /program-kit:knowledge-rule -->
+
+<!-- program-kit:knowledge-rule context.dotnet-adopted-baseline-context -->
+Offer the versioned Program Kit .NET defaults transparently when suitable. Preserve explicit
+technology choices and explain consequential alternatives in normal plan/ADR discussion. A local
+ORM, serializer or test framework needs its actual contracts and tests, not a bootstrap assessment
+or consumer qualification ceremony. Routine compatible defaults need no new approval packet.
+<!-- /program-kit:knowledge-rule -->
+
+<!-- program-kit:knowledge-rule context.dotnet-managed-sdk-authority -->
+For the selected managed engineering route, its `global.json` owns the actual SDK requirement even
+when the device reports another version. Provide the matching human preparation script and verify
+the fresh device selection before dependent execution. A project using a different supported route
+can own its own reviewed SDK policy; no bootstrap override receipt is needed. Do not silently alter
+managed pins or retained locks to conceal a mismatch or claim unexecuted compatibility.
+<!-- /program-kit:knowledge-rule -->
+
+<!-- program-kit:knowledge-rule context.device-toolchain-recovery -->
+When shared device tools are missing or have different versions, follow the installed
+governance `references/device-toolchain-policy.md`. Pause dependent execution and give the user
+officially verified exact-version commands for their own terminal, along with the pin, detected
+path/version, privileges, persistent selection and refresh/verification steps. The agent never
+runs device installers, even with legacy approval flags. Repository-local SDK/Node/npm tools,
+local uv tool environments and temporary PATH selections cannot establish device readiness.
+Preserve existing installations and side-by-side SDKs. Normal project restores remain supported.
+<!-- /program-kit:knowledge-rule -->
+
+## Modular DDD topology
+
+<!-- program-kit:knowledge-rule principle.dotnet-topology-introduction -->
+Apply `modularity-and-contracts.md` and `vertical-slicing.md`. The required compilation graph, for
+the responsibilities actually present, is:
+<!-- /program-kit:knowledge-rule -->
+
+<!-- program-kit:knowledge-rule context.dotnet-compilation-graph-example -->
+```text
+external Orbyss.Foundation.Host
+  -> packaged activatable implementations selected by shells.json
+
+Application.Context.Core
+  -> .NET, lightweight framework abstractions, and explicitly accepted Core dependencies only
+
+Application.Context
+Application.Context.Api
+Application.Context.PostgreSql
+Application.Context.Import.Excel
+  -> Application.Context.Core
+  -> capability-specific helper packages when needed
+
+Application.Consumer.Provider
+  -> Application.Consumer.Core
+  -> Application.Provider.Core
+```
+<!-- /program-kit:knowledge-rule -->
+
+<!-- program-kit:knowledge-rule principle.dotnet-compilation-ownership -->
+The external host is the composition root and loads the selected feature package closure; the
+consumer repository does not create a host project unless an explicit accepted opt-out selects a
+custom runtime. A runtime feature is an activation type and stable identity, not a project-name
+layer. Project, package, and namespace names MUST NOT contain a generic `.Feature` segment. Use
+domain language and name an implementation by the behavior, protocol, provider, consumer/provider
+bridge, or helper it contributes. A class such as `CatalogFeature` remains
+appropriate inside `PriceCalculator.Catalog`.
+
+Separate Core, runtime implementation, API and persistence projects even within one bounded context
+and deployment bundle. Package, feature activation and deployment decisions remain distinct from
+compiler boundaries. Shell/deployment configuration selects runtime behavior directly; C#
+composition-preset projects and the composition project role are retired. Namespace waivers and role relabeling cannot replace this rule. Pure Core utilities and
+empty initial repositories remain legitimate without invented runtime projects.
+
+`Application.Context.Core` defines the context's deliberately stable semantic surface: aggregates,
+entities, value objects, domain commands and queries, business result models, invariants, policies,
+evaluators, lifecycle states and transitions, domain events, contributor contracts, registry
+descriptors, and semantic capability interfaces. It excludes CShells activation, DI registration,
+ASP.NET wire types, middleware, EF/provider types, persistence records, migrations, serializers,
+vendor SDKs, and private implementation interfaces. Core must not become a catalogue of every type
+that could possibly be shared.
+<!-- /program-kit:knowledge-rule -->
+
+<!-- program-kit:knowledge-rule principle.dotnet-domain-package-topology -->
+Do not create `Domain`, `Contracts`, `Application`, or `Infrastructure` projects as generic
+horizontal layers. Create a `.Core` only for an identified context or cohesive subdomain. Put the
+default activatable implementation in the domain-named project, HTTP adaptation in `.Api`, and
+technology/provider behavior in packages such as `.PostgreSql`, `.Import.Excel`, or `.Import.Json`.
+Use `Application.Consumer.Provider` for a consumer-owned cross-context bridge, such as
+`PriceCalculator.Forms.Catalog`, which implements a Forms capability using a Catalog-published
+capability while translating between their semantic models.
+
+Do not create a solution-wide `Core`, `Common`, or `Shared` project as a default dependency sink.
+Keep a genuinely shared semantic kernel small, jointly owned, versioned, and backed by an Accepted
+ADR. Name it for the business language it owns rather than `Shared`.
+<!-- /program-kit:knowledge-rule -->
+
+## Feature references and inheritance
+
+<!-- program-kit:knowledge-rule context.dotnet-dependency-native-overlap -->
+- Implementations of a semantic capability depend on its owning `.Core`; they do not depend on each
+  other.
+- A concrete feature-to-feature `ProjectReference` is forbidden by default.
+- Concrete inheritance does not create an exception merely for code reuse.
+- A feature-family extension may reference an explicitly designed abstraction or abstract base only
+  under the ownership, substitutability, ADR, and allowlist rules in `modularity-and-contracts.md`.
+- `InternalsVisibleTo` is forbidden. Tests and probes exercise the same public contracts and
+  composition seams available to consumers; they do not receive privileged access to implementation
+  details. When a behavior cannot be verified that way, introduce a deliberately owned public
+  abstraction or test it through the package's externally observable runtime behavior.
+- CI validates both the declared MSBuild `ProjectReference`/`PackageReference` graph and compiled
+  assembly dependencies. The declared graph is authoritative even when a reference has not yet
+  produced a CLR type dependency. Exact Accepted exceptions are allowlisted; naming conventions
+  alone are insufficient enforcement.
+<!-- /program-kit:knowledge-rule -->
+
+## Orbyss Foundation host and CShells profile mapping
+
+<!-- program-kit:knowledge-rule context.dotnet-host-adoption-context -->
+When .NET is selected, adopt the application-neutral `Orbyss.Foundation.Host` and its CShells/Nuplane composition model as the
+automatic Program Kit default unless intake explicitly opts out. This default uses CShells as the
+runtime composition mechanism; it does not imply that shells are tenants or bounded contexts.
+Disclose independently pinned packages, third-party dependencies and sources as consequential
+technical defaults in the normal plan. Preserve an explicit human custom host choice, not an assistant-authored proposal. Minimal APIs
+are an endpoint style and do not imply a consumer-owned host. The canonical default and review
+procedure is `program-kit-governance/references/tool-selection.md`, including effective-profile
+lookup before package knowledge. Architecture review
+alone does not execute restore or establish runtime compatibility; selected actions own those checks.
+<!-- /program-kit:knowledge-rule -->
+
+<!-- program-kit:knowledge-rule principle.package-source-routing -->
+Treat Package Source Mapping as source routing, not as a Program Kit dependency allowlist. The
+scaffolded configuration maps the protected `CShells` and `Nuplane` namespaces to their approved
+preview feeds; a generic nuget.org mapping accepts other public packages and their transitive
+closures. Consumers own dependency selection and may add private sources with specific namespace
+mappings. Keep dependency approval in the consumer's version pins, lock files, architecture rules,
+security checks, and accepted decisions rather than requiring Program Kit to enumerate package IDs.
+<!-- /program-kit:knowledge-rule -->
+
+<!-- program-kit:knowledge-rule context.dotnet-host-optout-context -->
+An explicit human opt-out may select a conventional ASP.NET Core host. A Proposed ADR, or even an
+assistant-authored Accepted label without the actual human decision, is not an opt-out. Record why the Orbyss Foundation host is
+not suitable and which composition, packaging, task, and deployment responsibilities the project
+then owns.
+<!-- /program-kit:knowledge-rule -->
+
+<!-- program-kit:knowledge-rule context.accepted-host-mapping-context -->
+When accepted:
+<!-- /program-kit:knowledge-rule -->
+
+<!-- program-kit:knowledge-rule principle.shell-feature-lifecycle-contract -->
+- feature projects reference `CShells.Abstractions` or, for web composition,
+  `CShells.AspNetCore.Abstractions`;
+- the selected published host owns the full `CShells` and `CShells.AspNetCore` runtimes;
+  a consumer host references them only under its Accepted host opt-out. A resource
+  composition is an executable model, not a required C# composition project;
+- the host bridges Nuplane-loaded feature assemblies into CShells and owns only its runtime configuration;
+- an `IShellFeature` or `IWebShellFeature` is a composition adapter, not the domain model;
+- every packaged feature declares `[ShellFeature("<exact FoundationFeatureIdentity>")]`; CLR,
+  package, runtime-catalog, and `shells.json` identities are one case-sensitive contract;
+- `ConfigureServices` registers implementations of owned domain or contract interfaces and contains
+  no business policy;
+- feature configuration is bound to feature-owned typed options using the accepted .NET options
+  mechanism, with startup validation, safe defaults, and secret-free checked-in values;
+- feature constructors use only permitted root services and shell construction context; behavior
+  resolves composed services only after the shell provider exists;
+- CShells `DependsOn` feature metadata expresses activation ordering and availability coupling, not
+  permission to reference another feature's implementation or store;
+- business features normally collaborate through contracts rather than feature dependencies;
+- named platform-feature dependencies are documented with optionality, ordering, failure behavior,
+  and compatibility treatment;
+- all CShells packages are pinned to the same researched version and exercised through composition,
+  isolation, routing, reload, drain, and upgrade tests appropriate to the accepted capabilities.
+<!-- /program-kit:knowledge-rule -->
+
+<!-- program-kit:knowledge-rule principle.shell-isolation-security -->
+Shells are runtime isolation contexts; they are not bounded contexts. Verify tenant identity,
+authorization, service lifetimes, root-service copying/exclusion, configuration isolation, route
+ownership, background scopes, drain semantics, and recovery before treating a shell as a security or
+tenancy boundary.
+<!-- /program-kit:knowledge-rule -->
+
+## ASP.NET Core Minimal API slices
+
+<!-- program-kit:knowledge-rule principle.minimal-api-operation-ownership -->
+Default HTTP slices to ASP.NET Core Minimal APIs. `IWebShellFeature.MapEndpoints` maps a feature-owned
+`RouteGroupBuilder`; slices own mapping, wire contracts, policies, orchestration and mirrored tests.
+Use `Operations/<Operation>/Endpoint.cs` in the owning `.Api`, with operation-specific namespace/type
+`Endpoint` matching its filename. Co-locate needed `Request.cs`, `Response.cs`, admission and mappings.
+Endpoints own routes and success/failure metadata; peers never call implementation helpers. Test partials'
+file/type names match too. Resolve scoped endpoints per request through explicit owned constructor
+dependencies; never capture them at startup.
+
+Register the typed `InvokeAsync` itself. Route/query/header/service inputs belong on its signature;
+`[FromRoute]`/`[FromQuery]`/`[FromHeader]`/`[FromServices]` make sources/names explicit. Matching simple
+route parameters, `HttpContext` and `CancellationToken` bind natively. Include browser-page/redirect
+handlers; separate differing inputs. Do not hide route inputs in shared `HttpContext` delegates and
+manually read/parse `RouteValues`. Attributes on manually called inner methods do not bind arguments.
+Conversion does not prove nonempty identities, ownership, authorization or domain invariants.
+Failed `:guid` constraints normally give 404; failed conversion after matching normally gives 400.
+Preserve justified canonical-token/strong-ETag/repeated-header admission and bounded JSON readers:
+explicitly bind raw headers, then validate semantics that Guid conversion cannot supply.
+See [native binding](https://learn.microsoft.com/aspnet/core/fundamentals/minimal-apis/parameter-binding?view=aspnetcore-10.0).
+
+Features compose registrations/routes, not DTOs, validators or business orchestration. Domain behavior
+stays in its semantic capability. Small/bodyless operations may use one simple mapping with reviewed
+rationale; no mediator, handler class, empty model or extra layer is required. For example, the feature
+registers the scoped `Operations/ReadNote/Endpoint.cs` and the implementation registers `INoteLookup`:
+<!-- /program-kit:knowledge-rule -->
+
+<!-- program-kit:knowledge-rule context.minimal-api-layout-example -->
+```csharp
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Routing;
+
+namespace Notes.Api.Operations.ReadNote;
+
+/// <summary>Reads a note through the owning capability for the current request.</summary>
+internal sealed class Endpoint(INoteLookup notes)
+{
+    /// <summary>Maps the deferred request handler without capturing a scoped endpoint.</summary>
+    internal static void Map(RouteGroupBuilder group) => group.MapGet("/{id:guid}", InvokeAsync);
+
+    /// <summary>Resolves the operation endpoint for this request and propagates request cancellation.</summary>
+    private static Task<IResult> InvokeAsync(
+        [FromRoute] Guid id,
+        [FromServices] Endpoint endpoint,
+        CancellationToken cancellation
+    ) => endpoint.HandleAsync(id, cancellation);
+
+    /// <summary>Maps the owned lookup outcome to the operation's response.</summary>
+    private async Task<IResult> HandleAsync(Guid id, CancellationToken cancellation)
+    {
+        var outcome = await notes.Read(id, cancellation);
+
+        return ResponseMapping.Map(outcome);
+    }
+}
+```
+<!-- /program-kit:knowledge-rule -->
+
+<!-- program-kit:knowledge-rule principle.minimal-api-contract-verification -->
+Operation-owned `ResponseMapping` uses qualified Foundation typed response budgets and problem contracts.
+The layout omits mapping, authorization and metadata: define/test them per operation. Protected reads
+pass admitted identity through the application resource policy; never parse provider claims here.
+
+Record operation identity, ownership, paths and behavior in plan/tasks. Generate/compare OpenAPI through
+`eng/`, test actual contracts, and review composition/domain ownership. No separate api-proof or
+artifact-ownership attestations are required; folders alone establish no semantics.
+
+Require every public operation to define:
+
+- a stable route, HTTP method, endpoint name or operation identity, and owning feature;
+- explicit authorization or a deliberate anonymous decision;
+- request and response wire contracts distinct from domain entities and persistence models;
+- validation and trust-boundary conversion;
+- success and material failure statuses with a stable error schema;
+- cancellation propagation and explicit timeout, retry, idempotency, and concurrency behavior where relevant;
+- OpenAPI metadata and compatibility evidence when externally consumed;
+- traceability to the owning vertical slice and verification of the observable outcome.
+
+On Foundation 0.3.10+, use `JsonContractFactory.Request<T>()` / `Response<T>()` from
+`Orbyss.Foundation.Json.AspNetCore` for shared DTO/operation metadata with named capacity/profile
+overrides. Preserve supported intervals; shell budgets remain separate.
+
+Endpoints adapt transport and may coordinate application/domain work; business invariants stay
+outside them. Filters handle transport concerns, never hidden domain pipelines.
+<!-- /program-kit:knowledge-rule -->
+
+<!-- program-kit:knowledge-rule principle.active-api-capability-bindings -->
+The selected Program Kit web runtime configures authentication schemes, middleware ordering, common
+Problem Details, correlation, standard security headers, CORS, and OpenAPI infrastructure from
+host/deployment configuration. Consumer `.Api` packages
+own route groups, wire contracts, mapping, endpoint-specific bounds, OpenAPI metadata, stable
+application permission identities, and authorization/rate-policy requirements. They do not create a
+root `Administration.Api` or `Platform.WebBoundary` package merely to repeat host plumbing.
+
+Register each semantic capability implementation in the activatable package that implements it.
+Before implementation, record the capability, its owning Core project, concrete implementation,
+implementing project, registration entry point, and the implementation project's activated feature
+identity in the existing plan/tasks and the engineering composition configuration where applicable.
+No artifact-ownership runtimeComposition dossier is required. Endpoint implementations never reference
+persistence providers merely to make the external host aware of both packages. List every active owned
+capability binding; its Core and implementation projects are distinct, and composition is not an
+implementation role. Validate `config/program-kit/architecture.json` with `repository_architecture.py --planned`
+after-plan/after-tasks and before affected implementation. Real shell activation/resolution/lifetime
+tests must prove registration behavior; method existence alone cannot prove correct DI wiring.
+Test route collisions, shell prefixes, authorization metadata, schema generation, problem responses,
+and dynamic endpoint refresh when those CShells capabilities are used.
+<!-- /program-kit:knowledge-rule -->
+
+<!-- program-kit:knowledge-rule principle.openapi-producer-client-closure -->
+For an externally consumed OpenAPI surface, register a consumer-owned contract in
+`config/program-kit/openapi-contracts.json` before implementation readiness. The contract names the shell and
+every route-contributing feature, uses its shell's unique declared host `runtimeStage` plus `/packages`
+as its package closure (legacy consumers use `artifacts/release-bundle/packages`), and pins
+the managed `Orbyss.Foundation.OpenApi.Exporter` and oasdiff versions. Start an empty registry with
+`scripts/openapi_init.py`; these managed tools are adopted baseline choices, not a new consumer
+ADR. `scripts/Build.ps1` then composes those feature packages
+without opening a listener or running shell initializers, normalizes and compatibility-checks the result,
+runs the separately locked client generator, and finally compiles the application's own TypeScript graph.
+The exporter tool is restored only when the registry is non-empty; its dependencies are not added to feature
+projects or the application. Generator dependencies remain consumer-selected inside the isolated generator
+package, subject to strict peer/engine resolution evidence.
+<!-- /program-kit:knowledge-rule -->
+
+<!-- program-kit:knowledge-rule principle.protected-api-policy-boundary -->
+When the application has an authenticated browser boundary, the selected Orbyss Foundation host web
+profile owns the versioned runtime contract in `../secure-web-profiles.md`. Feature endpoints declare
+a stable application permission/policy or explicit anonymous access; they do not select schemes,
+parse provider token shapes, implement login/logout, or return tokens. Deployment configuration maps
+provider roles, scopes, or claims to canonical application permissions. Resource-specific
+authorization handlers stay with the owning `.Api` implementation when generic permission metadata
+cannot express the rule.
+Do not add a feature-side provider-role parser, canonical `permissions` claim parser, or wrapper
+`*PermissionPolicy` around the managed dynamic policy provider. A bodyless/no-effect permission probe
+uses only `.RequireAuthorization("permission:<identity>")`. A command or query that changes, reveals,
+or admits protected business state additionally invokes the owning resource/state/effect rule.
+<!-- /program-kit:knowledge-rule -->
+
+## Domain and persistence rules
+
+- Model aggregates and rich domain behavior only where business complexity warrants them; simple
+  slices may use transaction scripts without bypassing ownership and contract rules.
+- Core domain types are POCOs and do not depend on ASP.NET Core, CShells, EF Core, serializers, or DI.
+- Core declares the smallest cohesive semantic capabilities its consumers need. One interface may
+  contain multiple naturally related methods when they share purpose, consumers, consistency,
+  security, availability, ownership, lifecycle, and replacement. Do not create one interface per
+  method, table, or aggregate.
+- Split a capability when consumers, optionality, security, consistency, performance, evolution, or
+  credible provider support differs. A single provider class may implement multiple capability
+  interfaces.
+- Name capabilities for business intent, such as `IActiveCatalogItemLookup`,
+  `ICatalogRevisionLifecycle`, or `IPriceDashboardQueries`; do not prescribe repositories, stores,
+  units of work, generic CRUD, `DbSet`, or `IQueryable` boundaries.
+- Provider-specific persistence records, mappings, migrations, `DbContext`, SQL/query expressions,
+  cursors, and schema details remain private to the provider package. Use separate provider-owned EF
+  entities; do not map Core models directly, even when they are persistence-ignorant POCOs.
+- Cross-context reads use a consumer-owned capability/bridge, an intentionally published Core
+  language, a read projection, or an API. Domains exchange business-semantic boundary models, never
+  persistence records or another context's internal aggregates.
+- Cross-module writes and shared transactions require an Accepted ADR.
+
+Prefer exported Foundation identity/profile/problem constants and typed public contribution seams
+when the qualified selection supplies them. Preserve exact-version compatibility adapters for older
+selections. Deployment byte/depth/deadline budgets use typed validated options; lifecycle-bound route,
+schema and replay values use cohesive owner-specific Constants/keys types. Preserve canonical byte
+versions and page large result sections independently through construction/storage/browser delivery.
+Review serializers and provider configuration using only BCL types explicitly in source review;
+dependency-prefix checks and green analyzers cannot establish their semantic ownership.
+
+## Domain and integration events
+
+Domain-owned Core projects may reference `Orbyss.Foundation.DomainEvents.Abstractions` and declare immutable
+past-tense events. Activatable implementations register typed handlers; the selected
+`Orbyss.Foundation.DomainEvents` feature supplies awaited, scoped, sequential in-process dispatch. Handler
+order is not a workflow contract. Use an explicit orchestrator when reactions require ordering,
+results, retries, compensation, or lifecycle state.
+
+Use a synchronous capability when the caller needs an answer or must observe failure. Use a domain
+event for a fact with zero or more independent observers. Plain domain-event publication is not
+durable and MUST NOT be described as reliable post-commit, background, broker, or cross-process
+delivery. Those requirements trigger the separately tracked Integration Events design and its
+transactional outbox, at-least-once, idempotency, retry/dead-letter, ordering, versioning, replay,
+retention, security, and observability obligations.
+Cross-resource physical effects also require resource-side fencing and retained
+removal protection; see the [bounded fencing recipe](../cross-resource-fencing.md)
+for publication, reconciliation-read, erase, replay, deadline and crash boundaries.
+
+## Profile evidence
+
+Re-verify package APIs and supported framework versions during project research; do not treat this
+profile as a package-version pin. Primary sources accessed 2026-08-25:
+
+- [CShells](https://www.nuget.org/packages/CShells) and
+  [CShells.AspNetCore](https://www.nuget.org/packages/CShells.AspNetCore) runtime capabilities;
+- [CShells.AspNetCore.Abstractions](https://www.nuget.org/packages/CShells.AspNetCore.Abstractions)
+  for lightweight `IWebShellFeature` feature projects;
+- [ASP.NET Core Minimal API route handlers and route groups](https://learn.microsoft.com/aspnet/core/fundamentals/minimal-apis/route-handlers);
+- [.NET DDD domain-model guidance](https://learn.microsoft.com/dotnet/architecture/microservices/microservice-ddd-cqrs-patterns/net-core-microservice-domain-model)
+  and [infrastructure dependency guidance](https://learn.microsoft.com/dotnet/architecture/microservices/microservice-ddd-cqrs-patterns/infrastructure-persistence-layer-design).
+
+## Orbyss Foundation building blocks and engineering companions
+
+When .NET is selected, `../dotnet-engineering.md` is the mandatory language/runtime profile and
+`../dotnet-runtime-and-application-bundles.md` is the mandatory CShells hosting and deployment profile.
+Installing Program Kit does not select .NET and does not scaffold these files. The public
+`speckit.program-kit-governance.sync` coordinator selects adapters from accepted repository decisions.
+Its .NET adapter applies only after an Accepted .NET technology decision, an Accepted ADR selecting
+the Orbyss Foundation host and building blocks, and explicit human approval for the independently
+pinned packages and NuGet sources. Review the coordinator's phase-specific plan before applying it.
+The .NET adapter installs or updates the hash-tracked repository baseline; JavaScript repositories
+use the shared package context without requiring that baseline. The standard
+runtime is `Orbyss.Foundation.Host`; consuming repositories generate
+feature packages and an application release bundle targeting the unchanged digest-pinned published
+Foundation host image. Consumers neither build host images nor produce host DLLs; follow
+`dotnet-runtime-and-application-bundles.md` for shell, host and Nuplane configuration and optional feeds.

@@ -1,0 +1,14 @@
+# Program Kit
+
+Program Kit supports product intake and native Spec Kit feature delivery.
+Development is private; documentation and approved downloads are public.
+
+- [Documentation](https://github.com/orbyss-io/program-kit-releases/blob/main/docs/README.md)
+- [Installation](https://github.com/orbyss-io/program-kit-releases/blob/main/docs/installation.md)
+- [Usage](https://github.com/orbyss-io/program-kit-releases/blob/main/docs/usage.md)
+- [AI assistant instructions](https://github.com/orbyss-io/program-kit-releases/blob/main/docs/ai-assistants.md)
+- [Versioned downloads](https://github.com/orbyss-io/program-kit-releases/releases)
+
+Use the matching release tag for previews. The automatic GitHub source archive is
+the public distribution tree, not the complete tooling archive. Download the named
+program-kit-tooling asset for update/recovery inputs.

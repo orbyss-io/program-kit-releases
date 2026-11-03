@@ -1,0 +1,68 @@
+name: Approve publication
+run-name: Publish ${{ inputs.expected_commit }} packages ${{ inputs.run_id }} payload ${{ inputs.expected_payload }}
+on:
+  workflow_dispatch:
+    inputs:
+      expected_commit:
+        description: Exact private source commit inspected in the private Release run
+        required: true
+        type: string
+      run_id:
+        description: Exact successful private package run
+        required: true
+        type: string
+      expected_payload:
+        description: Inspected candidate payload SHA256
+        required: true
+        type: string
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: publication
+  cancel-in-progress: false
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - name: Check repository and configured native approval
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PUBLIC_REPOSITORY: ${{ github.repository }}
+          SOURCE_COMMIT: ${{ inputs.expected_commit }}
+          CANDIDATE_RUN: ${{ inputs.run_id }}
+          PAYLOAD: ${{ inputs.expected_payload }}
+        run: |
+          python - <<'PY'
+          import datetime, json, os, re, subprocess
+          assert os.environ['PUBLIC_REPOSITORY'] == 'orbyss-io/program-kit-releases'
+          assert os.environ['GITHUB_REF'] == 'refs/heads/main'
+          assert re.fullmatch('[0-9a-f]{40}', os.environ['SOURCE_COMMIT'])
+          assert re.fullmatch('[1-9][0-9]*', os.environ['CANDIDATE_RUN'])
+          assert re.fullmatch('[0-9a-f]{64}', os.environ['PAYLOAD'])
+          environment = json.loads(subprocess.check_output(['gh','api','repos/' + os.environ['PUBLIC_REPOSITORY'] + '/environments/publication']))
+          assert any(rule['type'] == 'required_reviewers' and rule.get('reviewers') and not rule.get('prevent_self_review', False) for rule in environment['protection_rules']), 'Configure publication reviewers; sole-maintainer self-review must be allowed'
+          with open(os.environ['GITHUB_STEP_SUMMARY'], 'a') as out:
+              out.write('Approve publication of the exact inspected private candidate.\n\n')
+              out.write('Source: `' + os.environ['SOURCE_COMMIT'] + '`\n\nPayload: `' + os.environ['PAYLOAD'] + '`\n\n')
+              out.write('Review private package run https://github.com/orbyss-io/program-kit/actions/runs/' + os.environ['CANDIDATE_RUN'] + ' and the private Release inspection, including asset hashes and validation gaps.\n\n')
+              out.write('Approval authorizes private publication of these bytes. This public run never checks out private source or downloads private logs/artifacts.\n')
+          PY
+  authorize:
+    needs: inspect
+    environment: publication
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - name: Dispatch the exact approved private publication
+        env:
+          GH_TOKEN: ${{ secrets.SOURCE_DISPATCH_TOKEN }}
+          APPROVAL_RUN: ${{ github.run_id }}
+          SOURCE_COMMIT: ${{ inputs.expected_commit }}
+          CANDIDATE_RUN: ${{ inputs.run_id }}
+          PAYLOAD: ${{ inputs.expected_payload }}
+        run: |
+          gh workflow run publish.yml --repo orbyss-io/program-kit --ref main \
+            -f expected_commit="$SOURCE_COMMIT" -f run_id="$CANDIDATE_RUN" \
+            -f approval_run="$APPROVAL_RUN" -f expected_payload="$PAYLOAD"
