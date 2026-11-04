@@ -7,11 +7,38 @@ explicitly; they are not an automatic upgrade from a stable version.
 ## Prepare your machine
 
 Use an existing supported Python (3.11 or newer), Git and Spec Kit (>=1.1.1,<2).
-The release's initializer checks those requirements. Prepare missing device tools
-in your own terminal using the remediation it prints. An agent must not install
-or replace your global tools. A separately selected Python also needs the declared
-`packaging>=23` and `PyYAML>=6,<7` libraries. Product-specific .NET, Node, Docker or
-other tools are selected and checked when that product needs them.
+The Python selected by the initializer also needs `packaging>=23` and
+`PyYAML>=6,<7`. Check the default Python in your terminal:
+
+```text
+python -c "import sys, packaging, yaml; print(sys.executable); print('packaging:', packaging.__version__, 'PyYAML:', yaml.__version__)"
+```
+
+If either library is missing or outside the supported range, prepare it in that
+Python in your own terminal, or select an existing Python that already has both.
+For example, to prepare the default Python yourself:
+
+```text
+python -m pip install "packaging>=23" "PyYAML>=6,<7"
+```
+
+To select another existing Python for this terminal, set `SPECKIT_PYTHON` to its
+absolute executable path before running the initializer. Replace the example path
+with your own:
+
+```powershell
+$env:SPECKIT_PYTHON = "C:\path\to\python.exe"
+```
+
+```bash
+export SPECKIT_PYTHON="/path/to/python3"
+```
+
+Run the check above with the selected executable in place of `python`. The
+initializer checks the selected tools and prints remediation for missing
+prerequisites. An agent must not install or replace global device tools.
+Product-specific .NET, Node, Docker or other tools are selected and checked when
+that product needs them.
 
 Create or choose a project directory, initialize Git, and download the initializer
 asset matching your operating system and chosen version. Inspect it before running.
